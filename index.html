@@ -499,18 +499,54 @@
     flex: none;
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-  .dock__meta { min-width: 0; line-height: 1.3; }
+  .dock__toggle {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(5, 6, 7, 0.55);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.25s ease, background 0.25s ease;
+  }
+  .dock:hover .dock__toggle,
+  .dock.is-paused .dock__toggle { opacity: 1; }
+  .dock__toggle:hover { background: rgba(5, 6, 7, 0.82); }
+  .dock__toggle:focus-visible { opacity: 1; outline: 1px solid rgba(255, 255, 255, 0.6); }
+  .dock__icon { display: none; place-items: center; }
+  .dock__icon--pause { display: grid; }
+  .dock.is-paused .dock__icon--pause { display: none; }
+  .dock.is-paused .dock__icon--play { display: grid; }
+  .dock__icon svg { width: 13px; height: 13px; display: block; }
+  .dock__icon--play svg { margin-left: 1px; }
+  .dock__body { min-width: 0; width: clamp(150px, 17vw, 210px); line-height: 1.3; }
+  .dock__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .dock__label {
-    display: block;
     font-size: 8px;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.16em;
     color: var(--dock-accent, var(--gold));
     text-transform: uppercase;
+    white-space: nowrap;
   }
+  .dock__time {
+    font-size: 8.5px;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.42);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .dock__time.is-error { color: #ffb4a8; letter-spacing: 0; }
   .dock__title {
     display: block;
-    margin-top: 2px;
-    max-width: 240px;
+    margin-top: 3px;
     font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
@@ -519,11 +555,27 @@
   }
   .dock__artist {
     display: block;
-    font-size: 10px;
+    font-size: 9.5px;
     color: rgba(255, 255, 255, 0.5);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .dock__progress {
+    position: relative;
+    height: 2px;
+    margin-top: 6px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.14);
+    cursor: pointer;
+  }
+  .dock__bar {
+    display: block;
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--dock-accent, var(--gold));
+    transition: width 0.12s linear;
   }
   .eq {
     display: flex;
@@ -544,6 +596,7 @@
   .eq i:nth-child(2) { animation-delay: -0.5s; height: 100%; }
   .eq i:nth-child(3) { animation-delay: -0.1s; height: 70%; }
   .eq i:nth-child(4) { animation-delay: -0.65s; height: 40%; }
+  .dock.is-paused .eq i { animation-play-state: paused; opacity: 0.45; }
   .dock__close {
     width: 26px;
     height: 26px;
@@ -594,8 +647,8 @@
     .chart__play { opacity: 1; transform: none; }
     .chart__title { font-size: 27px; }
     .foot { flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 28px; }
-    .dock { bottom: 16px; max-width: calc(100% - 24px); }
-    .dock__title { max-width: 150px; }
+    .dock { bottom: 16px; max-width: calc(100% - 24px); gap: 10px; padding: 8px 12px 8px 8px; }
+    .dock__body { width: 148px; }
   }
   @media (max-height: 800px) and (min-width: 1081px) {
     .page { padding-top: 16px; padding-bottom: 24px; }
@@ -665,17 +718,17 @@
         </header>
         <div class="chart__foot">
           <ol class="chart__list">
-            <li><button class="track" type="button" data-title="默（Live）" data-artist="张杰">
+            <li><button class="track" type="button" data-title="默（Live）" data-artist="张杰" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/62/5e/d6/625ed6d9-6499-466b-733b-fa37b17eb30d/mzaf_3129483175416580572.plus.aac.p.m4a">
               <span class="track__rank">01</span>
               <span class="track__main"><span class="track__name">默（Live）</span><span class="track__artist">张杰</span></span>
               <span class="track__trend is-up">↑ 2</span>
             </button></li>
-            <li><button class="track" type="button" data-title="挪威的森林（Live）" data-artist="伍佰 &amp; China Blue">
+            <li><button class="track" type="button" data-title="挪威的森林（Live）" data-artist="伍佰 &amp; China Blue" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/20/ea/8e/20ea8e61-e3cb-4a32-1305-1bf314d8b53a/mzaf_15129192660820939860.plus.aac.p.m4a">
               <span class="track__rank">02</span>
               <span class="track__main"><span class="track__name">挪威的森林（Live）</span><span class="track__artist">伍佰 &amp; China Blue</span></span>
               <span class="track__trend">—</span>
             </button></li>
-            <li><button class="track" type="button" data-title="2002年的第一场雪（Live）" data-artist="刀郎">
+            <li><button class="track" type="button" data-title="2002年的第一场雪（Live）" data-artist="刀郎" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/df/a4/be/dfa4be47-7db7-c9a3-4e37-5d29d1c9edb6/mzaf_10754143315150366299.plus.aac.p.m4a">
               <span class="track__rank">03</span>
               <span class="track__main"><span class="track__name">2002年的第一场雪（Live）</span><span class="track__artist">刀郎</span></span>
               <span class="track__trend">↓ 1</span>
@@ -705,17 +758,17 @@
         </header>
         <div class="chart__foot">
           <ol class="chart__list">
-            <li><button class="track" type="button" data-title="起风了" data-artist="买辣椒也用券">
+            <li><button class="track" type="button" data-title="起风了" data-artist="买辣椒也用券" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/59/76/ba/5976ba80-6049-6127-50d9-6781bddc2df8/mzaf_6260020937354522916.plus.aac.p.m4a">
               <span class="track__rank">01</span>
               <span class="track__main"><span class="track__name">起风了</span><span class="track__artist">买辣椒也用券</span></span>
               <span class="track__trend is-up">↑ 5</span>
             </button></li>
-            <li><button class="track" type="button" data-title="晚风心里吹" data-artist="阿梨粤">
+            <li><button class="track" type="button" data-title="晚风心里吹" data-artist="阿梨粤" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/2e/4f/452e4f3f-7b63-c245-db5c-31e5fc5e40cd/mzaf_2060507064731499431.plus.aac.p.m4a">
               <span class="track__rank">02</span>
               <span class="track__main"><span class="track__name">晚风心里吹</span><span class="track__artist">阿梨粤</span></span>
               <span class="track__trend is-new">NEW</span>
             </button></li>
-            <li><button class="track" type="button" data-title="孤勇者" data-artist="陈奕迅">
+            <li><button class="track" type="button" data-title="孤勇者" data-artist="陈奕迅" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/21/95/fc/2195fc03-7b97-ecf2-d94c-565953fbeaf6/mzaf_13364580786128200519.plus.aac.p.m4a">
               <span class="track__rank">03</span>
               <span class="track__main"><span class="track__name">孤勇者</span><span class="track__artist">陈奕迅</span></span>
               <span class="track__trend">↓ 2</span>
@@ -745,17 +798,17 @@
         </header>
         <div class="chart__foot">
           <ol class="chart__list">
-            <li><button class="track" type="button" data-title="APT." data-artist="ROSÉ &amp; Bruno Mars">
+            <li><button class="track" type="button" data-title="APT." data-artist="ROSÉ &amp; Bruno Mars" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/70/41/42/70414259-14f5-245e-bd79-93c80401d556/mzaf_8687698460653166345.plus.aac.p.m4a">
               <span class="track__rank">01</span>
               <span class="track__main"><span class="track__name">APT.</span><span class="track__artist">ROSÉ &amp; Bruno Mars</span></span>
               <span class="track__trend is-new">NEW</span>
             </button></li>
-            <li><button class="track" type="button" data-title="Die With A Smile" data-artist="Lady Gaga &amp; Bruno Mars">
+            <li><button class="track" type="button" data-title="Die With A Smile" data-artist="Lady Gaga &amp; Bruno Mars" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/07/6a/99/076a99ed-b946-431b-6f1f-54fa187ca5bd/mzaf_8102882277995122875.plus.aac.p.m4a">
               <span class="track__rank">02</span>
               <span class="track__main"><span class="track__name">Die With A Smile</span><span class="track__artist">Lady Gaga &amp; Bruno Mars</span></span>
               <span class="track__trend is-up">↑ 1</span>
             </button></li>
-            <li><button class="track" type="button" data-title="Birds of a Feather" data-artist="Billie Eilish">
+            <li><button class="track" type="button" data-title="Birds of a Feather" data-artist="Billie Eilish" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/31/d3/3431d34e-847f-5d66-df83-0bce688d997e/mzaf_18106743962423782018.plus.aac.p.m4a">
               <span class="track__rank">03</span>
               <span class="track__main"><span class="track__name">Birds of a Feather</span><span class="track__artist">Billie Eilish</span></span>
               <span class="track__trend">↓ 1</span>
@@ -785,17 +838,17 @@
         </header>
         <div class="chart__foot">
           <ol class="chart__list">
-            <li><button class="track" type="button" data-title="Superficial Love" data-artist="Ruth B.">
+            <li><button class="track" type="button" data-title="Superficial Love" data-artist="Ruth B." data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6a/e3/ce/6ae3ce34-7172-c0da-f049-0419ab14d725/mzaf_1327242720817418974.plus.aac.p.m4a">
               <span class="track__rank">01</span>
               <span class="track__main"><span class="track__name">Superficial Love</span><span class="track__artist">Ruth B.</span></span>
               <span class="track__trend">—</span>
             </button></li>
-            <li><button class="track" type="button" data-title="Shape of You" data-artist="Ed Sheeran">
+            <li><button class="track" type="button" data-title="Shape of You" data-artist="Ed Sheeran" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/44/c7/4f/44c74f0d-72dc-6143-d4d0-ba14d661ca0d/mzaf_9566898362556366703.plus.aac.p.m4a">
               <span class="track__rank">02</span>
               <span class="track__main"><span class="track__name">Shape of You</span><span class="track__artist">Ed Sheeran</span></span>
               <span class="track__trend is-up">↑ 3</span>
             </button></li>
-            <li><button class="track" type="button" data-title="Someone Like You" data-artist="Adele">
+            <li><button class="track" type="button" data-title="Someone Like You" data-artist="Adele" data-preview="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/08/22/2e/08222e25-43f5-20e6-a442-b8127ac83368/mzaf_1689070223363740216.plus.aac.p.m4a">
               <span class="track__rank">03</span>
               <span class="track__main"><span class="track__name">Someone Like You</span><span class="track__artist">Adele</span></span>
               <span class="track__trend">↓ 1</span>
@@ -809,17 +862,31 @@
   </main>
 
   <footer class="foot">
-    <span>封面与榜单数据仅用于界面演示</span>
+    <span>30 秒试听音源来自 Apple Music · 仅用于界面演示</span>
     <span class="foot__mark">Made for the night</span>
   </footer>
 </div>
 
+<audio id="audio" preload="none"></audio>
+
 <div class="dock" id="dock" aria-live="polite">
   <img class="dock__cover" id="dockCover" src="data:image/jpeg;base64,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" alt="" />
-  <div class="dock__meta">
-    <span class="dock__label">Now Playing</span>
+  <button class="dock__toggle" id="dockToggle" type="button" aria-label="播放或暂停试听" aria-pressed="false">
+    <span class="dock__icon dock__icon--play" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.53.85l10.2-6.5a1 1 0 0 0 0-1.7L9.53 4.65A1 1 0 0 0 8 5.5Z"/></svg>
+    </span>
+    <span class="dock__icon dock__icon--pause" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.4" height="14" rx="1"/><rect x="13.6" y="5" width="3.4" height="14" rx="1"/></svg>
+    </span>
+  </button>
+  <div class="dock__body">
+    <div class="dock__row">
+      <span class="dock__label">30s Preview</span>
+      <span class="dock__time" id="dockTime">0:00 / 0:30</span>
+    </div>
     <strong class="dock__title" id="dockTitle"></strong>
     <span class="dock__artist" id="dockArtist"></span>
+    <div class="dock__progress" id="dockProgress" role="progressbar" aria-label="试听进度" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0"><span class="dock__bar" id="dockBar"></span></div>
   </div>
   <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <button class="dock__close" id="dockClose" type="button" aria-label="停止播放">
@@ -833,64 +900,135 @@
     const dockCover = document.getElementById('dockCover');
     const dockTitle = document.getElementById('dockTitle');
     const dockArtist = document.getElementById('dockArtist');
+    const dockTime = document.getElementById('dockTime');
+    const dockProgress = document.getElementById('dockProgress');
+    const dockBar = document.getElementById('dockBar');
+    const dockToggle = document.getElementById('dockToggle');
     const closeBtn = document.getElementById('dockClose');
+    const audio = document.getElementById('audio');
     let activeTrack = null;
-    let hideTimer = null;
 
-    const selectTrack = (track, autoHide) => {
+    const fmt = (seconds) => {
+      const n = Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
+      return `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, '0')}`;
+    };
+
+    const showError = () => {
+      if (!activeTrack) return;
+      dock.classList.add('is-on');
+      dockToggle.setAttribute('aria-pressed', 'false');
+      dock.classList.add('is-paused');
+      dockTime.textContent = '试听加载失败';
+      dockTime.classList.add('is-error');
+    };
+
+    const setProgress = () => {
+      const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 30;
+      const ratio = Math.min(1, Math.max(0, audio.currentTime / duration));
+      dockBar.style.width = `${ratio * 100}%`;
+      dockTime.textContent = `${fmt(audio.currentTime)} / ${fmt(duration)}`;
+      dockTime.classList.remove('is-error');
+      dockProgress.setAttribute('aria-valuenow', String(Math.round(audio.currentTime)));
+      dockProgress.setAttribute('aria-valuemax', String(Math.round(duration)));
+    };
+
+    const setPlayingUI = (playing) => {
+      dock.classList.toggle('is-paused', !playing);
+      dockToggle.setAttribute('aria-pressed', String(playing));
+    };
+
+    const playPreview = (track) => {
       const card = track.closest('.chart');
       if (!card) return;
+      const preview = track.dataset.preview;
+      if (!preview) return;
+
+      if (activeTrack === track) {
+        if (audio.paused) audio.play().catch(showError);
+        else audio.pause();
+        return;
+      }
 
       if (activeTrack) activeTrack.classList.remove('is-active');
-      track.classList.add('is-active');
       activeTrack = track;
+      track.classList.add('is-active');
 
       const accent = getComputedStyle(card).getPropertyValue('--accent').trim();
       dock.style.setProperty('--dock-accent', accent);
       dockCover.src = card.dataset.cover;
       dockTitle.textContent = track.dataset.title;
       dockArtist.textContent = track.dataset.artist;
-
+      dockTime.textContent = '0:00 / 0:30';
+      dockTime.classList.remove('is-error');
+      dockBar.style.width = '0%';
       dock.classList.add('is-on');
+      setPlayingUI(true);
 
-      clearTimeout(hideTimer);
-      if (autoHide) {
-        hideTimer = setTimeout(() => {
-          dock.classList.remove('is-on');
-          if (activeTrack) activeTrack.classList.remove('is-active');
-          activeTrack = null;
-        }, 6000);
-      }
+      audio.pause();
+      audio.src = preview;
+      const playback = audio.play();
+      if (playback && typeof playback.catch === 'function') playback.catch(showError);
+    };
+
+    const stop = () => {
+      audio.pause();
+      audio.currentTime = 0;
+      dock.classList.remove('is-on', 'is-paused');
+      if (activeTrack) activeTrack.classList.remove('is-active');
+      activeTrack = null;
+      dockBar.style.width = '0%';
+      dockTime.textContent = '0:00 / 0:30';
+      dockTime.classList.remove('is-error');
+      dockToggle.setAttribute('aria-pressed', 'false');
     };
 
     document.addEventListener('click', (event) => {
       const track = event.target.closest('.track');
-      if (track) {
-        selectTrack(track, false);
-        return;
-      }
+      if (track) { playPreview(track); return; }
 
       const play = event.target.closest('.chart__play');
       if (play) {
-        const card = play.closest('.chart');
-        const first = card.querySelector('.track');
-        if (first) selectTrack(first, false);
+        const first = play.closest('.chart')?.querySelector('.track');
+        if (first) playPreview(first);
       }
     });
 
-    closeBtn.addEventListener('click', () => {
-      dock.classList.remove('is-on');
-      if (activeTrack) activeTrack.classList.remove('is-active');
-      activeTrack = null;
-      clearTimeout(hideTimer);
+    dockToggle.addEventListener('click', () => {
+      if (!audio.src) return;
+      if (audio.paused) audio.play().catch(showError);
+      else audio.pause();
     });
+
+    dockProgress.addEventListener('click', (event) => {
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+      const rect = dockProgress.getBoundingClientRect();
+      const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+      audio.currentTime = ratio * audio.duration;
+    });
+
+    audio.addEventListener('timeupdate', setProgress);
+    audio.addEventListener('durationchange', setProgress);
+    audio.addEventListener('play', () => setPlayingUI(true));
+    audio.addEventListener('pause', () => {
+      if (dock.classList.contains('is-on') && !audio.ended) setPlayingUI(false);
+    });
+    audio.addEventListener('error', showError);
+    audio.addEventListener('ended', () => {
+      const card = activeTrack?.closest('.chart');
+      const tracks = card ? [...card.querySelectorAll('.track')] : [];
+      const next = activeTrack ? tracks[tracks.indexOf(activeTrack) + 1] : null;
+      if (next) {
+        playPreview(next);
+      } else {
+        setPlayingUI(false);
+        dockBar.style.width = '100%';
+      }
+    });
+
+    closeBtn.addEventListener('click', stop);
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && dock.classList.contains('is-on')) {
-        dock.classList.remove('is-on');
-        if (activeTrack) activeTrack.classList.remove('is-active');
-        activeTrack = null;
-      }
+      if (event.key === 'Escape' && dock.classList.contains('is-on')) stop();
     });
   })();
 </script>
